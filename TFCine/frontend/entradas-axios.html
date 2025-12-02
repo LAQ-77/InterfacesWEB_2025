@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABM de Entradas con Búsqueda - Cine API</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    .btn-edit { background-color: #28a745; }
+    .btn-delete { background-color: #dc3545; }
+    .form-container { max-width: 600px; margin: 0 auto; }
+    .error { color: #dc3545; font-size: 0.875em; }
+    .search-section { background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+  <!-- Barra superior con título y botón de menú -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🎟️ Entradas</h1>
+    <a href="index.html" class="btn btn-secondary">← Menú</a>
+  </div>
+
+  <!-- Formulario de búsqueda -->
+  <div class="search-section">
+    <h5 class="mb-3">🔍 Buscar Entradas</h5>
+    <div class="row g-2">
+      <div class="col-md-3">
+        <input type="text" class="form-control" id="search-asiento" placeholder="Asiento (ej: F12)">
+      </div>
+      <div class="col-md-3">
+        <input type="text" class="form-control" id="search-espectador" placeholder="Nombre del espectador">
+      </div>
+      <div class="col-md-3">
+        <input type="text" class="form-control" id="search-pelicula" placeholder="Título de la película">
+      </div>
+      <div class="col-md-3">
+        <input type="date" class="form-control" id="search-fecha">
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de CRUD (crear/editar) -->
+  <div class="form-container bg-white p-4 rounded shadow mb-4">
+    <h3 id="form-title">Crear Nueva Entrada</h3>
+    <form id="entrada-form">
+      <input type="hidden" id="entrada-id" value="">
+
+      <div class="mb-3">
+        <label for="espectador" class="form-label">Espectador *</label>
+        <select class="form-select" id="espectador" required>
+          <option value="">Cargando...</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="pelicula" class="form-label">Película *</label>
+        <select class="form-select" id="pelicula" required>
+          <option value="">Cargando...</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="numeroAsiento" class="form-label">Número de Asiento *</label>
+        <input type="text" class="form-control" id="numeroAsiento" placeholder="Ej: F12" required>
+        <div class="error" id="error-asiento"></div>
+      </div>
+
+      <div class="mb-3">
+        <label for="fechaHoraFuncion" class="form-label">Fecha y Hora de la Función *</label>
+        <input type="datetime-local" class="form-control" id="fechaHoraFuncion" required>
+        <div class="error" id="error-fecha"></div>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="button" class="btn btn-secondary" id="btn-cancelar" style="display:none;">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Entrada</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de entradas -->
+  <div class="bg-white p-4 rounded shadow">
+    <h3 class="mb-3">Lista de Entradas <span id="result-count" class="badge bg-secondary ms-2"></span></h3>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Espectador</th>
+            <th>Película</th>
+            <th>Asiento</th>
+            <th>Función</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="entradas-list">
+          <tr><td colspan="6" class="text-center">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = {
+    entradas: 'http://localhost:8080/api/entradas',
+    espectadores: 'http://localhost:8080/api/espectadores',
+    peliculas: 'http://localhost:8080/api/peliculas'
+  };
+
+  // Elementos
+  const form = document.getElementById('entrada-form');
+  const formTitle = document.getElementById('form-title');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  const selectEspectador = document.getElementById('espectador');
+  const selectPelicula = document.getElementById('pelicula');
+  const inputAsiento = document.getElementById('numeroAsiento');
+  const inputFecha = document.getElementById('fechaHoraFuncion');
+  const listado = document.getElementById('entradas-list');
+  const resultCount = document.getElementById('result-count');
+
+  // Inputs de búsqueda
+  const searchAsiento = document.getElementById('search-asiento');
+  const searchEspectador = document.getElementById('search-espectador');
+  const searchPelicula = document.getElementById('search-pelicula');
+  const searchFecha = document.getElementById('search-fecha');
+
+  let todasLasEntradas = [];
+  let espectadores = [];
+  let peliculas = [];
+
+  // Inicializar
+  document.addEventListener('DOMContentLoaded', async () => {
+    await cargarDatosIniciales();
+    
+    // Eventos de búsqueda
+    [searchAsiento, searchEspectador, searchPelicula, searchFecha].forEach(input => {
+      input.addEventListener('input', aplicarFiltros);
+    });
+
+    form.addEventListener('submit', handleSubmit);
+    btnCancelar.addEventListener('click', limpiarFormulario);
+  });
+
+  async function cargarDatosIniciales() {
+    try {
+      const [resEsp, resPel, resEnt] = await Promise.all([
+        axios.get(API.espectadores),
+        axios.get(API.peliculas),
+        axios.get(API.entradas)
+      ]);
+
+      espectadores = resEsp.data;
+      peliculas = resPel.data;
+      todasLasEntradas = resEnt.data;
+
+      renderizarSelects();
+      aplicarFiltros(); // Mostrar todas al inicio
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      listado.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error al cargar los datos.</td></tr>`;
+    }
+  }
+
+  function renderizarSelects() {
+    selectEspectador.innerHTML = '<option value="">Seleccione un espectador</option>';
+    espectadores.forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.id;
+      opt.textContent = `${e.nombre} (${e.dni})`;
+      selectEspectador.appendChild(opt);
+    });
+
+    selectPelicula.innerHTML = '<option value="">Seleccione una película</option>';
+    peliculas.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.titulo} (${p.director})`;
+      selectPelicula.appendChild(opt);
+    });
+  }
+
+  // 🔍 Aplicar filtros de búsqueda
+  function aplicarFiltros() {
+    const asiento = searchAsiento.value.trim().toLowerCase();
+    const espectador = searchEspectador.value.trim().toLowerCase();
+    const pelicula = searchPelicula.value.trim().toLowerCase();
+    const fecha = searchFecha.value; // formato YYYY-MM-DD
+
+    const filtradas = todasLasEntradas.filter(e => {
+      const coincideAsiento = !asiento || (e.numeroAsiento && e.numeroAsiento.toLowerCase().includes(asiento));
+      const coincideEspectador = !espectador || (e.espectador?.nombre && e.espectador.nombre.toLowerCase().includes(espectador));
+      const coincidePelicula = !pelicula || (e.pelicula?.titulo && e.pelicula.titulo.toLowerCase().includes(pelicula));
+      
+      let coincideFecha = true;
+      if (fecha && e.fechaHoraFuncion) {
+        const fechaEntrada = e.fechaHoraFuncion.split(' ')[0];
+        coincideFecha = fechaEntrada === fecha;
+      }
+
+      return coincideAsiento && coincideEspectador && coincidePelicula && coincideFecha;
+    });
+
+    renderizarEntradas(filtradas);
+    resultCount.textContent = filtradas.length;
+  }
+
+  function renderizarEntradas(entradas) {
+    if (entradas.length === 0) {
+      listado.innerHTML = '<tr><td colspan="6" class="text-center">No se encontraron entradas.</td></tr>';
+      return;
+    }
+
+    listado.innerHTML = entradas.map(e => `
+      <tr>
+        <td>${e.id}</td>
+        <td>${e.espectador?.nombre || '—'}</td>
+        <td>${e.pelicula?.titulo || '—'}</td>
+        <td>${e.numeroAsiento || '—'}</td>
+        <td>${formatFechaParaMostrar(e.fechaHoraFuncion)}</td>
+        <td>
+          <button class="btn btn-sm btn-edit me-1" onclick="editarEntrada(${e.id})">Editar</button>
+          <button class="btn btn-sm btn-delete" onclick="eliminarEntrada(${e.id})">Eliminar</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function formatFechaParaMostrar(fechaStr) {
+    if (!fechaStr) return '—';
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function formatFechaParaInput(fechaStr) {
+    if (!fechaStr) return '';
+    return fechaStr.replace(' ', 'T').substring(0, 16);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+    let tieneError = false;
+    if (!inputAsiento.value.trim()) {
+      document.getElementById('error-asiento').textContent = 'Requerido';
+      tieneError = true;
+    }
+    if (!inputFecha.value) {
+      document.getElementById('error-fecha').textContent = 'Requerido';
+      tieneError = true;
+    }
+
+    if (tieneError) return;
+
+    const entrada = {
+      numeroAsiento: inputAsiento.value.trim(),
+      fechaHoraFuncion: inputFecha.value.replace('T', ' ') + ':00',
+      espectador: { id: parseInt(selectEspectador.value) },
+      pelicula: { id: parseInt(selectPelicula.value) }
+    };
+
+    const id = document.getElementById('entrada-id').value;
+
+    try {
+      if (id) {
+        await axios.put(`${API.entradas}/${id}`, entrada);
+      } else {
+        await axios.post(API.entradas, entrada);
+      }
+
+      const res = await axios.get(API.entradas);
+      todasLasEntradas = res.data;
+      aplicarFiltros();
+      limpiarFormulario();
+      alert(id ? 'Entrada actualizada' : 'Entrada creada');
+    } catch (error) {
+      alert('Error al guardar la entrada.');
+    }
+  }
+
+  // Funciones globales
+  window.editarEntrada = async function(id) {
+    try {
+      const res = await axios.get(`${API.entradas}/${id}`);
+      const e = res.data;
+
+      document.getElementById('entrada-id').value = e.id;
+      inputAsiento.value = e.numeroAsiento;
+      inputFecha.value = formatFechaParaInput(e.fechaHoraFuncion);
+      selectEspectador.value = e.espectador?.id || '';
+      selectPelicula.value = e.pelicula?.id || '';
+
+      formTitle.textContent = 'Editar Entrada';
+      btnCancelar.style.display = 'inline-block';
+    } catch (error) {
+      alert('Error al cargar la entrada.');
+    }
+  };
+
+  window.eliminarEntrada = async function(id) {
+    if (!confirm('¿Eliminar esta entrada?')) return;
+
+    try {
+      await axios.delete(`${API.entradas}/${id}`);
+      const res = await axios.get(API.entradas);
+      todasLasEntradas = res.data;
+      aplicarFiltros();
+      alert('Entrada eliminada');
+    } catch (error) {
+      alert('Error al eliminar.');
+    }
+  };
+
+  function limpiarFormulario() {
+    document.getElementById('entrada-id').value = '';
+    form.reset();
+    formTitle.textContent = 'Crear Nueva Entrada';
+    btnCancelar.style.display = 'none';
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+  }
+</script>
+
+</body>
+</html>

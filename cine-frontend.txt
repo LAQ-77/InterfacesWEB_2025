@@ -1,0 +1,5 @@
+TFCine/cine-frontend/
+├── index.html                 ← Menú principal
+├── peliculas.html             ← ABM Películas (fetch)
+├── espectadores.html          ← ABM Espectadores (fetch)
+└── entradas-axios.html        ← ABM Entradas (Axios + búsqueda)

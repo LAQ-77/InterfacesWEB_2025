@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cine API - Menú Principal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .crud-card { transition: transform 0.2s; }
+    .crud-card:hover { transform: translateY(-5px); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important; }
+  </style>
+</head>
+<body class="bg-light">
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold">🍿 Sistema de Gestión de Cine</h1>
+    <p class="lead">Administra películas, espectadores y entradas desde una interfaz sencilla.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <a href="peliculas.html" class="text-decoration-none">
+        <div class="card crud-card h-100 shadow-sm border-0">
+          <div class="card-body text-center">
+            <div class="card-icon text-primary">🎬</div>
+            <h5 class="card-title">Películas</h5>
+            <p class="card-text">Gestiona el catálogo de películas.</p>
+            <button class="btn btn-outline-primary">Ir al ABM</button>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="espectadores.html" class="text-decoration-none">
+        <div class="card crud-card h-100 shadow-sm border-0">
+          <div class="card-body text-center">
+            <div class="card-icon text-success">👤</div>
+            <h5 class="card-title">Espectadores</h5>
+            <p class="card-text">Administra la base de espectadores.</p>
+            <button class="btn btn-outline-success">Ir al ABM</button>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-4">
+      <a href="entradas-axios.html" class="text-decoration-none">
+        <div class="card crud-card h-100 shadow-sm border-0">
+          <div class="card-body text-center">
+            <div class="card-icon text-danger">🎟️</div>
+            <h5 class="card-title">Entradas</h5>
+            <p class="card-text">Registra y gestiona entradas vendidas.</p>
+            <button class="btn btn-outline-danger">Ir al ABM</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="text-center mt-5 text-muted">
+    <p>💡 Asegúrate de que tu API REST esté corriendo en <code>http://localhost:8080</code></p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

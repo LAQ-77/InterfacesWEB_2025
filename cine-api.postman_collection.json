@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "cine-api-collection",
+		"name": "Cine API - Sistema de Gestión",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Películas",
+			"item": [
+				{
+					"name": "Listar todas las películas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/peliculas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "peliculas"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener película por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/peliculas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "peliculas", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear nueva película",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Matrix\",\n  \"director\": \"Lana Wachowski\",\n  \"duracion\": 136\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/peliculas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "peliculas"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar película",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Matrix Reloaded\",\n  \"director\": \"Lana Wachowski\",\n  \"duracion\": 138\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/peliculas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "peliculas", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar película",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/peliculas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "peliculas", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Espectadores",
+			"item": [
+				{
+					"name": "Listar todos los espectadores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/espectadores",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "espectadores"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener espectador por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/espectadores/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "espectadores", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear nuevo espectador",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/espectadores",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "espectadores"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar espectador",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Carlos Pérez\",\n  \"dni\": \"87654321\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/espectadores/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "espectadores", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar espectador",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/espectadores/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "espectadores", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Entradas",
+			"item": [
+				{
+					"name": "Listar todas las entradas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/entradas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "entradas"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener entrada por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/entradas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "entradas", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear nueva entrada",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroAsiento\": \"F12\",\n  \"fechaHoraFuncion\": \"2025-12-01 20:00:00\",\n  \"espectador\": {\n    \"id\": 1\n  },\n  \"pelicula\": {\n    \"id\": 1\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/entradas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "entradas"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar entrada",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroAsiento\": \"F13\",\n  \"fechaHoraFuncion\": \"2025-12-01 22:00:00\",\n  \"espectador\": {\n    \"id\": 1\n  },\n  \"pelicula\": {\n    \"id\": 1\n  }\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/entradas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "entradas", "1"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar entrada",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/entradas/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "entradas", "1"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
+}
